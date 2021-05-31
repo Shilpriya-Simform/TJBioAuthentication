@@ -51,13 +51,23 @@ public class TJBioAuthenticator: NSObject {
 public extension TJBioAuthenticator {
     
     // checks if Biometric Authentication is available on the device.
-    func isBiometricAuthenticationAvailable() -> Bool {
+    // modify method with compltion handler to get error.
+    func isBiometricAuthenticationAvailable(complition: @escaping (_ isSuccess: Bool, _ error:TJAuthErrors?) -> ()) {
         var error: NSError? = nil
         
         if LAContext().canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            return (error == nil)
+            print("lock error",error?.localizedDescription)
+            if error == nil {
+                complition(true,nil)
+            } else {
+                let errorType = TJAuthErrors.errorType(error as! LAError)
+                
+            }
+        } else {
+            print("lock error bio fail",error?.localizedDescription)
+            let errorType = TJAuthErrors.errorType(error as! LAError)
+            complition(false,errorType)
         }
-        return false
     }
     
     
